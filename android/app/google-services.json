@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "576163770499",
+    "project_id": "newcallerapp",
+    "storage_bucket": "newcallerapp.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:576163770499:android:78df70c732db77221babb6",
+        "android_client_info": {
+          "package_name": "com.caller_app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBj00btvY3kw3bDfroKf3ixCDExEEjSxvI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
