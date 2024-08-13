@@ -1,10 +1,24 @@
-import React, { useState } from 'react';
-import { View, TextInput, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import React, {useState} from 'react';
+import {
+  View,
+  TextInput,
+  Text,
+  StyleSheet,
+  TouchableOpacity,
+} from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
 
-const TextInputField = ({ label, iconName, secureTextEntry, field, form, style, ...props }) => {
-  const { name } = field;
-  const { touched, errors } = form;
+const TextInputField = ({
+  label,
+  iconName,
+  secureTextEntry,
+  field,
+  form,
+  style,
+  ...props
+}) => {
+  const {name} = field;
+  const {touched, errors} = form;
   const isError = touched[name] && errors[name];
 
   const [secureEntry, setSecureEntry] = useState(secureTextEntry);
@@ -31,8 +45,14 @@ const TextInputField = ({ label, iconName, secureTextEntry, field, form, style, 
           </View>
         )}
         {secureTextEntry && (
-          <TouchableOpacity style={styles.icon} onPress={togglePasswordVisibility}>
-            <Icon name={secureEntry ? 'eye-off-outline' : 'eye-outline'} size={20} color="#ccc" />
+          <TouchableOpacity
+            style={styles.icon}
+            onPress={togglePasswordVisibility}>
+            <Icon
+              name={secureEntry ? 'eye-off-outline' : 'eye-outline'}
+              size={20}
+              color="#ccc"
+            />
           </TouchableOpacity>
         )}
       </View>
@@ -59,12 +79,12 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     paddingLeft: 10,
     paddingRight: 10,
-    width: '100%', 
+    width: '100%',
   },
   input: {
     flex: 1,
     height: 40,
-    marginLeft: 10, 
+    marginLeft: 10,
   },
   icon: {
     marginLeft: 10,

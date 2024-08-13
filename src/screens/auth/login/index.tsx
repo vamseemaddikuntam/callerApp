@@ -1,11 +1,11 @@
 import React from 'react';
-import { View, StyleSheet, StatusBar } from 'react-native';
+import {View, StyleSheet, StatusBar} from 'react-native';
 import LoginForm from '../../../components/LoginForm';
 
-export default function Login({ navigation }) {
+export default function Login({navigation}) {
   return (
     <View style={styles.container}>
-       <StatusBar backgroundColor= '#4682B4'/>
+      <StatusBar backgroundColor="#4682B4" />
       <LoginForm navigation={navigation} />
     </View>
   );

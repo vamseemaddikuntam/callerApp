@@ -44,11 +44,11 @@ export default function Home({ navigation }) {
   APNRef.current = APN;
 
   const [users, setUsers] = useState([]);
-  // console.log('users---->', users)
+
   // const addUserToFirestore = async (user) => {
   //   try {
   //     await firestore().collection('users').add(user);
-  //     console.log('User added to Firestore!');
+
   //   } catch (error) {
   //     console.error('Error adding user to Firestore: ', error);
   //   }
@@ -84,7 +84,7 @@ export default function Home({ navigation }) {
   useEffect(() => {
     async function getFCMtoken() {
       const authStatus = await messaging().requestPermission();
-      console.log('authStatus-->',authStatus)
+     
       const enabled =
         authStatus === messaging.AuthorizationStatus.AUTHORIZED ||
         authStatus === messaging.AuthorizationStatus.PROVISIONAL;
@@ -92,12 +92,10 @@ export default function Home({ navigation }) {
 
       if (enabled) {
         const token = await messaging().getToken();
-        console.log('token--->',token)
         const querySnapshot = await firestore()
           .collection("users")
           .where("token", "==", token)
           .get();
-          console.log('querySnapshot--->',querySnapshot)
         const uids = querySnapshot.docs.map((doc) => {
           if (doc && doc?.data()?.callerId) {
             const { token, platform, APN, callerId } = doc?.data();
@@ -110,7 +108,6 @@ export default function Home({ navigation }) {
           }
           return doc;
         });
-        console.log('uids--->',uids)
         if (uids && uids.length == 0) {
           addUser({ token });
         } else {
@@ -122,8 +119,6 @@ export default function Home({ navigation }) {
     async function getTokenAndMeetingId() {
       const videoSDKtoken = getToken();
       const videoSDKMeetingId = await createMeeting({ token: videoSDKtoken });
-      console.log('videoSDKtoken--->',videoSDKtoken)
-      console.log('videoSDKMeetingId--->',videoSDKMeetingId)
       setVideosdkToken(videoSDKtoken);
       setVideosdkMeeting(videoSDKMeetingId);
     }
@@ -265,7 +260,6 @@ export default function Home({ navigation }) {
       .add(obj)
       .then(() => {
         setfirebaseUserConfig(obj);
-        console.log("User added!");
       });
   };
 

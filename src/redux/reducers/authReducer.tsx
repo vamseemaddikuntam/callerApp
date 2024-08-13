@@ -7,9 +7,7 @@ const initialState = {
   accessToken: null,
   error: null,
 };
-console.log('initialState-->',initialState)
 const authReducer = (state = initialState, action) => {
-  console.log('action--->', action)
   switch (action.type) {
     case LOGIN_SUCCESS:
       return {

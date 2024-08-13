@@ -1,26 +1,28 @@
 // authActions.js
 import {
   LOGIN_SUCCESS,
-  LOGIN_FAILURE,
   SIGNUP_SUCCESS,
-  SIGNUP_FAILURE,
-  PROFILE_UPDATE_SUCCESS, 
-  PROFILE_UPDATE_FAILURE
+  PROFILE_UPDATE_SUCCESS,
+  PROFILE_UPDATE_FAILURE,
 } from '../types';
-import { login as loginApi, signUp as signUpApi, updateProfile as updateProfileApi } from '../../api/apiInstance';
+import {
+  login as loginApi,
+  signUp as signUpApi,
+  updateProfile as updateProfileApi,
+} from '../../api/apiInstance';
 
-export const login = (loginInfo) => async (dispatch) => {
+export const login = loginInfo => async dispatch => {
   try {
     const response = await loginApi(loginInfo);
-    const { token, data } = response;
+    const {token, data} = response;
     const user = {
       _id: data._id,
       username: data.username,
       email: data.email,
       role: data.role,
     };
-    dispatch({ type: LOGIN_SUCCESS, payload: { user, accessToken: token } });
-    return Promise.resolve(); 
+    dispatch({type: LOGIN_SUCCESS, payload: {user, accessToken: token}});
+    return Promise.resolve();
   } catch (error) {
     const tempData = {
       user: {
@@ -30,18 +32,22 @@ export const login = (loginInfo) => async (dispatch) => {
         role: 'mode_1',
       },
       accessToken: 'temporary_token',
-      errorMessage: error.response?.data?.message || 'An unexpected error occurred.',
+      errorMessage:
+        error.response?.data?.message || 'An unexpected error occurred.',
     };
-    dispatch({ type: LOGIN_SUCCESS, payload: { user: tempData?.user, accessToken: tempData?.accessToken } });
+    dispatch({
+      type: LOGIN_SUCCESS,
+      payload: {user: tempData?.user, accessToken: tempData?.accessToken},
+    });
     // dispatch({ type: LOGIN_FAILURE, payload: error.response.data });
     return Promise.reject(error);
   }
 };
 
-export const signUp = (userInfo) => async (dispatch) => {
+export const signUp = userInfo => async dispatch => {
   try {
     const response = await signUpApi(userInfo);
-    const { token, data } = response;
+    const {token, data} = response;
     const user = {
       _id: data._id,
       username: data.username,
@@ -50,8 +56,8 @@ export const signUp = (userInfo) => async (dispatch) => {
       isActive: data.IsActive,
       sendOtp: data.sendOtp,
     };
-    dispatch({ type: SIGNUP_SUCCESS, payload: { user, accessToken: token } });
-    return Promise.resolve(); 
+    dispatch({type: SIGNUP_SUCCESS, payload: {user, accessToken: token}});
+    return Promise.resolve();
   } catch (error) {
     const tempData = {
       user: {
@@ -63,18 +69,22 @@ export const signUp = (userInfo) => async (dispatch) => {
         sendOtp: '123456',
       },
       accessToken: 'temporary_token',
-      errorMessage: error.response?.data?.message || 'An unexpected error occurred.',
+      errorMessage:
+        error.response?.data?.message || 'An unexpected error occurred.',
     };
-    dispatch({ type: SIGNUP_SUCCESS, payload: { user : tempData?.user, accessToken: tempData?.accessToken } });
+    dispatch({
+      type: SIGNUP_SUCCESS,
+      payload: {user: tempData?.user, accessToken: tempData?.accessToken},
+    });
     // dispatch({ type: SIGNUP_FAILURE, payload: error.response.data });
     return Promise.reject(error);
   }
 };
 
-export const updateProfile = (profileData) => async (dispatch) => {
+export const updateProfile = profileData => async dispatch => {
   try {
     const response = await updateProfileApi(profileData);
-    const { data } = response;
+    const {data} = response;
     const user = {
       _id: data._id,
       username: data.username,
@@ -83,8 +93,8 @@ export const updateProfile = (profileData) => async (dispatch) => {
       fullName: data.fullName,
       mobileNo: data.mobileNo,
     };
-    dispatch({ type: PROFILE_UPDATE_SUCCESS, payload: { user } });
+    dispatch({type: PROFILE_UPDATE_SUCCESS, payload: {user}});
   } catch (error) {
-    dispatch({ type: PROFILE_UPDATE_FAILURE, payload: error.response.data });
+    dispatch({type: PROFILE_UPDATE_FAILURE, payload: error.response.data});
   }
 };
