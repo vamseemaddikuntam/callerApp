@@ -9,63 +9,60 @@ import KeyboardAvoidingWrapper from '../utils/KeyboardAvoidingWrapper';
 import callerLogo from '../assets/image/caller.png';
 import {COLORS} from '../theme';
 import {login} from '../redux/actions/authActions';
-import {useDispatch} from 'react-redux';
+import {useDispatch, useSelector} from 'react-redux';
+import FullScreenLoader from '../components/FullScreenLoader';
 
-// Import password_needed from the theme or config
-const PASSWORD_NEEDED = false; // This should be imported from your theme/config
+const PASSWORD_NEEDED = false;
 
 const LoginForm = ({navigation}) => {
   const dispatch = useDispatch();
+  const {loading} = useSelector(state => state.auth);
+
   const initialValues = {
-    userName: '',
+    email: '',
     password: PASSWORD_NEEDED ? '' : undefined,
   };
 
   const validationSchema = Yup.object().shape({
-    userName: Yup.string().required('Username is required'),
+    email: Yup.string()
+      .email('Invalid email address')
+      .required('Email is required'),
     password: PASSWORD_NEEDED
       ? Yup.string().required('Password is required')
       : Yup.string(),
   });
 
-  const handleSubmit = (values, {resetForm}) => {
-    navigation.navigate('BottomStack');
-    const {userName, password} = values;
-    if (userName.toLowerCase() !== 'tempuser') {
-      return Snackbar.show({
-        text: PASSWORD_NEEDED
-          ? 'Login failed. Please try again.'
-          : 'Login failed. Please try again with correct username.',
-        duration: Snackbar.LENGTH_SHORT,
-        backgroundColor: '#FF5733',
-      });
-    } else {
-      dispatch(
-        login({userName, password: PASSWORD_NEEDED ? password : undefined}),
-      )
+  const handleSubmit = (
+    values: {email: string; password: any},
+    {resetForm}: any,
+  ) => {
+    const {email, password} = values;
+    if (email) {
+      dispatch(login({email, password: PASSWORD_NEEDED ? password : undefined}))
         .then(() => {
           resetForm();
           navigation.navigate('BottomStack');
         })
-        .catch(error => {
-          resetForm(); //need to remove after demo
-          navigation.navigate('BottomStack'); //need to remove after demo
-          // Snackbar.show({
-          //     text: PASSWORD_NEEDED ? 'Login failed. Please try again.' : 'Login failed. Please try again with correct username.',
-          //     duration: Snackbar.LENGTH_SHORT,
-          //     backgroundColor: '#FF5733', // Error color
-          // });
+
+        .catch((error: {data: {message: string}}) => {
+          Snackbar.show({
+            text: error.data
+              ? error?.data?.message
+              : 'Login failed. Please try again with correct email.',
+            duration: Snackbar.LENGTH_SHORT,
+            backgroundColor: '#FF5733',
+          });
         });
     }
   };
 
   const handleRegister = () => {
     navigation.navigate('Registration');
-    // navigation.navigate('ModeSelection');
   };
 
   return (
     <KeyboardAvoidingWrapper style={styles.container} imageSource={callerLogo}>
+      {loading && <FullScreenLoader />}
       <Text style={styles.header}>Login</Text>
       <Formik
         initialValues={initialValues}
@@ -82,19 +79,21 @@ const LoginForm = ({navigation}) => {
           <>
             <View style={styles.formContainer}>
               <TextInputField
-                label="Username"
-                iconName="person-outline"
-                onChangeText={handleChange('userName')}
-                onBlur={handleBlur('userName')}
-                value={values.userName}
+                label="Email"
+                iconName="mail-outline"
+                onChangeText={handleChange('email')}
+                onBlur={handleBlur('email')}
+                value={values.email}
                 field={{
-                  name: 'userName',
+                  name: 'email',
                   onChange: handleChange,
                   onBlur: handleBlur,
-                  value: values.userName,
+                  value: values.email,
                 }}
                 form={{touched, errors}}
                 secureTextEntry={false}
+                keyboardType="email-address"
+                autoCapitalize="none"
               />
 
               {PASSWORD_NEEDED && (
@@ -120,7 +119,8 @@ const LoginForm = ({navigation}) => {
                 title="Login"
                 onPress={handleSubmit}
                 disabled={
-                  !values.userName ||
+                  loading ||
+                  !values.email ||
                   (PASSWORD_NEEDED && !values.password) ||
                   Object.keys(errors).length > 0
                 }
@@ -134,7 +134,6 @@ const LoginForm = ({navigation}) => {
         <TouchableOpacity onPress={handleRegister}>
           <Text style={styles.registerLink}>click here to register</Text>
         </TouchableOpacity>
-        .
       </Text>
     </KeyboardAvoidingWrapper>
   );
@@ -143,7 +142,6 @@ const LoginForm = ({navigation}) => {
 const styles = StyleSheet.create({
   container: {
     width: '100%',
-    padding: 20,
   },
   header: {
     fontSize: 24,

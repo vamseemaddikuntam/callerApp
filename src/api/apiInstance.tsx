@@ -9,6 +9,7 @@ import {
   UPDATE_PROFILE_URL,
   UPDATE_SECURITY_QUESTIONS_URL,
   APP_BASE_URL,
+  RESEND_OTP_URL,
 } from './apiUrls';
 
 const apiInstance = axios.create({
@@ -20,45 +21,52 @@ const apiInstance = axios.create({
 
 apiInstance.interceptors.request.use(
   async config => {
-    console.log('config--->', config);
     if (config.url !== SIGN_UP_URL && config.url !== LOGIN_URL) {
       const token = await AsyncStorage.getItem('accessToken');
       if (token) {
         config.headers.Authorization = `Bearer ${token}`;
       }
     }
+    console.log('config--->',config)
     return config;
   },
+  
   error => Promise.reject(error),
 );
 
 // Response Interceptor
 apiInstance.interceptors.response.use(
   response => {
-    console.log('Response--->', response);
     return response;
   },
   error => {
-    console.error('Response error--->', error.response);
-    // You can handle specific status codes here, e.g., token expiration
     if (error.response && error.response.status === 401) {
-      // Handle unauthorized access, e.g., redirect to login
       console.log('Unauthorized access - redirecting to login...');
     }
-    return Promise.reject(error);
+    console.log('error===>',error.response)
+    return Promise.reject(error.response);
   },
 );
 
 // API Functions
+export const login = async loginInfo => {
+  try {
+    const response = await apiInstance.post(LOGIN_URL, loginInfo);
+    const {token, data} = response?.data;
+    await AsyncStorage.setItem('accessToken', token);
+    return {token, data};
+  } catch (error) {
+    throw error;
+  }
+};
+
 export const signUp = async userInfo => {
   try {
     const response = await apiInstance.post(SIGN_UP_URL, userInfo);
     const {token, data} = response.data;
-    // Store the access token
     await AsyncStorage.setItem('accessToken', token);
     return {token, data};
   } catch (error) {
-    console.error('Error signing up:', error);
     throw error;
   }
 };
@@ -68,23 +76,18 @@ export const verifyOtp = async otpInfo => {
     const response = await apiInstance.post(VERIFY_OTP_URL, otpInfo);
     return response.data;
   } catch (error) {
-    console.error('Error verifying OTP:', error);
     throw error;
   }
 };
 
-export const login = async loginInfo => {
+export const resendOtp = async () => {
   try {
-    const response = await apiInstance.post(LOGIN_URL, loginInfo);
-    const {token, data} = response?.data;
-    await AsyncStorage.setItem('accessToken', token);
-    return {token, data};
+    const response = await apiInstance.post(RESEND_OTP_URL);
+    return response.data;
   } catch (error) {
-    console.error('Error logging in:', error);
     throw error;
   }
 };
-
 export const modeThree = async () => {
   try {
     const response = await apiInstance.post(MODE_THREE_URL);

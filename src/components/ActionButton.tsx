@@ -1,27 +1,44 @@
 import React from 'react';
-import { TouchableOpacity, Text, StyleSheet, Dimensions } from 'react-native';
-import { COLORS } from '../theme';
+import {
+  TouchableOpacity,
+  Text,
+  StyleSheet,
+  View,
+  Dimensions,
+} from 'react-native';
+import {COLORS} from '../theme';
 
-const { width: screenWidth } = Dimensions.get('window');
-const buttonWidth = screenWidth * 0.9;
+const ActionButton = ({title, onPress, disabled, fullWidth = true}) => {
+  const {width: screenWidth} = Dimensions.get('window');
+  const buttonWidth = fullWidth ? screenWidth : screenWidth * 0.5;
 
-const ActionButton = ({ title, onPress, disabled }) => {
   return (
-    <TouchableOpacity
-      style={[styles.button, { width: buttonWidth }, disabled && styles.disabled]}
-      onPress={onPress}
-      disabled={disabled}
-    >
-      <Text style={styles.buttonText}>{title}</Text>
-    </TouchableOpacity>
+    <View
+      style={[
+        styles.buttonContainer,
+        {width: buttonWidth},
+        disabled && styles.disabled,
+      ]}>
+      <TouchableOpacity
+        style={styles.button}
+        onPress={onPress}
+        disabled={disabled}>
+        <Text style={styles.buttonText}>{title}</Text>
+      </TouchableOpacity>
+    </View>
   );
 };
 
 const styles = StyleSheet.create({
+  buttonContainer: {
+    paddingHorizontal: 20,
+    alignItems: 'center',
+  },
   button: {
     backgroundColor: COLORS.blue,
     borderRadius: 5,
     paddingVertical: 15,
+    width: '100%',
     alignItems: 'center',
   },
   buttonText: {

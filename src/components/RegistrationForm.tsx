@@ -6,14 +6,18 @@ import TextInputField from './TextInputField';
 import ActionButton from './ActionButton';
 import KeyboardAvoidingWrapper from '../utils/KeyboardAvoidingWrapper';
 import callerLogo from '../assets/image/caller.png';
-import {useDispatch} from 'react-redux';
+import {useDispatch, useSelector} from 'react-redux';
 import {signUp} from '../redux/actions/authActions';
+import FullScreenLoader from '../components/FullScreenLoader'; // Import the FullScreenLoader
+import Snackbar from 'react-native-snackbar';
 
 // Import password_needed from the theme or config
 const PASSWORD_NEEDED = false; // This should be imported from your theme/config
 
 const RegistrationForm = ({navigation}) => {
   const dispatch = useDispatch();
+  const {loading} = useSelector(state => state.auth); // Get loading state from Redux store
+
   const initialValues = {
     fullName: '',
     email: '',
@@ -45,9 +49,12 @@ const RegistrationForm = ({navigation}) => {
       : Yup.string(),
   });
 
-  const handleSubmit = (values, {resetForm}) => {
+  const handleSubmit = (
+    values: {fullName: any; email: any; username: any; password: any},
+    {resetForm}: any,
+  ) => {
     const {fullName, email, username, password} = values;
-
+    navigation.navigate('OTPScreen');
     dispatch(
       signUp({
         fullName,
@@ -57,22 +64,23 @@ const RegistrationForm = ({navigation}) => {
       }),
     )
       .then(() => {
-        resetForm(); // Reset the form on success
+        resetForm();
         navigation.navigate('OTPScreen');
       })
-      .catch(error => {
-        navigation.navigate('OTPScreen');
-        // Snackbar.show({
-        //   text: 'Registration failed. Please try again.',
-        //   duration: Snackbar.LENGTH_SHORT,
-        //   backgroundColor: '#FF5733', // Error color
-        // });
-        console.error('Registration error:', error);
+      .catch((error: {data: {message: string}}) => {
+        Snackbar.show({
+          text: error.data
+            ? error?.data?.message
+            : 'Registration failed. Please try again.',
+          duration: Snackbar.LENGTH_SHORT,
+          backgroundColor: '#FF5733',
+        });
       });
   };
 
   return (
     <KeyboardAvoidingWrapper style={styles.container} imageSource={callerLogo}>
+      {loading && <FullScreenLoader />}
       <Formik
         initialValues={initialValues}
         validationSchema={validationSchema}
@@ -183,7 +191,7 @@ const RegistrationForm = ({navigation}) => {
               <ActionButton
                 title="Send OTP"
                 onPress={handleSubmit}
-                disabled={Object.keys(errors).length > 0}
+                disabled={Object.keys(errors).length > 0 || loading}
               />
             </View>
           </View>
@@ -196,8 +204,6 @@ const RegistrationForm = ({navigation}) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 20,
-    justifyContent: 'center',
   },
   header: {
     fontSize: 24,
@@ -211,7 +217,7 @@ const styles = StyleSheet.create({
     textAlign: 'left',
   },
   formContainer: {
-    flex: 0.9,
+    flex: 1,
   },
   buttonContainer: {
     alignItems: 'center',

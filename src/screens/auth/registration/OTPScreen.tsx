@@ -1,26 +1,67 @@
-import React from 'react';
-import { View, Text, StyleSheet, Image } from 'react-native';
+import React, {useRef} from 'react';
+import {View, Text, StyleSheet} from 'react-native';
 import OTPInput from '../../../components/OTPInput';
 import KeyboardAvoidingWrapper from '../../../utils/KeyboardAvoidingWrapper';
 import callerLogo from '../../../assets/image/caller.png';
+import Snackbar from 'react-native-snackbar';
+import {useDispatch, useSelector} from 'react-redux';
+import FullScreenLoader from '../../../components/FullScreenLoader';
+import {resendOtp, verifyOtp} from '../../../redux/actions/authActions';
 
-const OTPScreen = ({ navigation }) => {
-  const handleSubmitOTP = (otp) => {
-    // Handle OTP submission logic here
-    console.log('Submitted OTP:', otp);
+const OTPScreen = ({navigation}) => {
+  const dispatch = useDispatch();
+  const {loading} = useSelector(state => state.auth);
+  const otpInputRef = useRef(null);
 
-    if (otp === '123456') {
-      navigation.navigate('ModeSelection');
-    } else {
-      alert('Invalid OTP');
-    }
+  const handleSubmitOTP = (otp: string) => {
+    dispatch(verifyOtp({verifyOtp: otp}))
+      .then(() => {
+        navigation.navigate('ModeSelection');
+      })
+      .catch((error: {data: {message: string}}) => {
+        Snackbar.show({
+          text: error.data
+            ? error?.data?.message
+            : 'OTP verification failed. Please try again.',
+          duration: Snackbar.LENGTH_SHORT,
+          backgroundColor: '#FF5733',
+        });
+      });
+  };
+
+  const handleResendOtp = () => {
+    dispatch(resendOtp())
+      .then(response => {
+        Snackbar.show({
+          text: response.message
+            ? response.message
+            : 'OTP has been resent successfully.',
+          duration: Snackbar.LENGTH_SHORT,
+          backgroundColor: '#28A745',
+        });
+        otpInputRef.current?.resetTimer(); // Reset the timer on successful OTP resend
+      })
+      .catch((error: {data: {message: string}}) => {
+        Snackbar.show({
+          text: error.data
+            ? error?.data?.message
+            : 'Failed to resend OTP. Please try again.',
+          duration: Snackbar.LENGTH_SHORT,
+          backgroundColor: '#FF5733',
+        });
+      });
   };
 
   return (
     <KeyboardAvoidingWrapper style={styles.container} imageSource={callerLogo}>
+      {loading && <FullScreenLoader />}
       <View style={styles.innerContainer}>
         <Text style={styles.header}>Enter OTP</Text>
-        <OTPInput onSubmit={handleSubmitOTP} />
+        <OTPInput
+          onSubmit={handleSubmitOTP}
+          resendOTP={handleResendOtp}
+          ref={otpInputRef}
+        />
       </View>
     </KeyboardAvoidingWrapper>
   );
@@ -31,12 +72,10 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    paddingHorizontal: 20,
-    marginVertical:50,
   },
   innerContainer: {
     alignItems: 'center',
-    flex:1,
+    flex: 1,
   },
   header: {
     fontSize: 24,

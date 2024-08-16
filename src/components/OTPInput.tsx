@@ -1,23 +1,50 @@
-import React, { useRef, useState, useEffect } from 'react';
-import { View, TextInput, StyleSheet, Button, Text } from 'react-native';
+import React, {
+  useRef,
+  useState,
+  useEffect,
+  useImperativeHandle,
+  forwardRef,
+} from 'react';
+import {View, TextInput, StyleSheet, Text} from 'react-native';
 import ActionButton from './ActionButton';
 
-const OTPInput = ({ onSubmit }) => {
+const OTPInput = forwardRef(({onSubmit, resendOTP}, ref) => {
   const [otpValues, setOtpValues] = useState(['', '', '', '', '', '']);
+  const [timeRemaining, setTimeRemaining] = useState(20);
+  const timerRef = useRef(null);
   const inputRefs = useRef([]);
 
+  useImperativeHandle(ref, () => ({
+    resetTimer: () => {
+      setTimeRemaining(20);
+      startTimer();
+    },
+  }));
+
   useEffect(() => {
-    inputRefs.current[0]?.focus(); // Autofocus on the first input field
+    startTimer();
+    return () => clearInterval(timerRef.current);
   }, []);
+
+  const startTimer = () => {
+    clearInterval(timerRef.current);
+    timerRef.current = setInterval(() => {
+      setTimeRemaining(prevTime => {
+        if (prevTime === 0) {
+          clearInterval(timerRef.current);
+          return 0;
+        }
+        return prevTime - 1;
+      });
+    }, 1000);
+  };
 
   const handleInputChange = (index, value) => {
     if (/^\d*$/.test(value)) {
-      // Ensure only digits are allowed
       const updatedOtpValues = [...otpValues];
       updatedOtpValues[index] = value;
       setOtpValues(updatedOtpValues);
 
-      // Move focus to the next input after entering a digit
       if (value.length === 1 && index < otpValues.length - 1) {
         inputRefs.current[index + 1]?.focus();
       }
@@ -27,10 +54,9 @@ const OTPInput = ({ onSubmit }) => {
   const handleKeyPress = (index, event) => {
     if (event.nativeEvent.key === 'Backspace') {
       const updatedOtpValues = [...otpValues];
-      updatedOtpValues[index] = ''; // Clear the current input field
+      updatedOtpValues[index] = '';
       setOtpValues(updatedOtpValues);
 
-      // Move focus to the previous input if deleting a digit
       if (index > 0) {
         inputRefs.current[index - 1]?.focus();
       }
@@ -39,10 +65,20 @@ const OTPInput = ({ onSubmit }) => {
 
   const handleSubmission = () => {
     const otp = otpValues.join('');
-    onSubmit(otp); // Pass OTP to onSubmit function provided by parent component
+    onSubmit(otp);
+  };
+
+  const handleResendOTP = () => {
+    setOtpValues(['', '', '', '', '', '']);
+    resendOTP();
   };
 
   const isInputFilled = otpValues.every(value => value.length === 1);
+  const minutes = Math.floor(timeRemaining / 60);
+  const seconds = timeRemaining % 60;
+  const timerText = `${minutes.toString().padStart(2, '0')}:${seconds
+    .toString()
+    .padStart(2, '0')}`;
 
   return (
     <View style={styles.container}>
@@ -57,25 +93,33 @@ const OTPInput = ({ onSubmit }) => {
             onKeyPress={event => handleKeyPress(index, event)}
             keyboardType="numeric"
             ref={ref => (inputRefs.current[index] = ref)}
-            autoFocus={index === 0} // Autofocus on the first input
+            autoFocus={index === 0}
           />
         ))}
       </View>
+      <Text style={styles.timerText}>Time remaining: {timerText}</Text>
       <View style={styles.buttonContainer}>
-      <ActionButton
-        title="Submit OTP"
-        onPress={handleSubmission}
-        disabled={!isInputFilled}
-      />
+        <ActionButton
+          title="Resend OTP"
+          onPress={handleResendOTP}
+          disabled={timeRemaining === 0 ? false : true}
+          fullWidth={false}
+        />
+        <ActionButton
+          title="Submit OTP"
+          onPress={handleSubmission}
+          disabled={!isInputFilled}
+          fullWidth={false}
+        />
       </View>
     </View>
   );
-};
+});
 
 const styles = StyleSheet.create({
   container: {
     alignItems: 'center',
-    flex:1,
+    flex: 1,
   },
   otpContainer: {
     flexDirection: 'row',
@@ -92,11 +136,18 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     fontSize: 20,
   },
+  timerText: {
+    marginTop: 20,
+    fontSize: 16,
+    color: 'blue',
+  },
   buttonContainer: {
-    width: '100%',
+    flexDirection: 'row',
+    justifyContent: 'space-between',
     alignItems: 'center',
-    position: 'absolute',
-    bottom: 20,
+    width: '100%',
+    paddingHorizontal: 20,
+    marginTop: 20,
   },
 });
 

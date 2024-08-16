@@ -5,6 +5,7 @@ export const APP_BASE_URL = 'https://gcm-cldtg2ha.b4a.run';
 // Auth Endpoints
 export const SIGN_UP_URL = '/gcm/signup';
 export const VERIFY_OTP_URL = '/gcm/verifyOtp';
+export const RESEND_OTP_URL = '/gcm/resendOtp';
 export const LOGIN_URL = '/gcm/login';
 
 // Call Endpoints

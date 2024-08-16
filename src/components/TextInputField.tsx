@@ -63,8 +63,8 @@ const TextInputField = ({
 
 const styles = StyleSheet.create({
   container: {
-    width: '100%',
     marginBottom: 20,
+    marginHorizontal: 20,
   },
   label: {
     fontSize: 18,
