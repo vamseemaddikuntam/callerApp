@@ -1,8 +1,8 @@
 import React from 'react';
-import { View, StyleSheet } from 'react-native';
+import {View, StyleSheet} from 'react-native';
 import RegistrationForm from '../../../components/RegistrationForm';
 
-export default function Registration({ navigation }) {
+export default function Registration({navigation}) {
   return (
     <View style={styles.container}>
       <RegistrationForm navigation={navigation} />

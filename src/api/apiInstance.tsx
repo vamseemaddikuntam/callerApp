@@ -32,6 +32,23 @@ apiInstance.interceptors.request.use(
   error => Promise.reject(error),
 );
 
+// Response Interceptor
+apiInstance.interceptors.response.use(
+  response => {
+    console.log('Response--->', response);
+    return response;
+  },
+  error => {
+    console.error('Response error--->', error.response);
+    // You can handle specific status codes here, e.g., token expiration
+    if (error.response && error.response.status === 401) {
+      // Handle unauthorized access, e.g., redirect to login
+      console.log('Unauthorized access - redirecting to login...');
+    }
+    return Promise.reject(error);
+  },
+);
+
 // API Functions
 export const signUp = async userInfo => {
   try {

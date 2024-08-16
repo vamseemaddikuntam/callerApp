@@ -2,11 +2,11 @@
  * @format
  */
 import 'react-native-get-random-values';
-import { AppRegistry } from 'react-native';
+import {AppRegistry} from 'react-native';
 import App from './App';
 import messaging from '@react-native-firebase/messaging';
 import VoipPushNotification from 'react-native-voip-push-notification';
-import { name as appName } from './app.json';
+import {name as appName} from './app.json';
 
 // Register background handler
 messaging().setBackgroundMessageHandler(async remoteMessage => {
@@ -22,16 +22,12 @@ VoipPushNotification.addEventListener('notification', notification => {
   VoipPushNotification.onVoipNotificationCompleted(notification.uuid);
 });
 
-import { register } from '@videosdk.live/react-native-sdk';
+import {register} from '@videosdk.live/react-native-sdk';
 
 // Register the VideoSDK service
 register();
 
 AppRegistry.registerComponent(appName, () => App);
-
-/**
- * @format
- */
 
 // import { AppRegistry, StatusBar, Linking, Platform } from "react-native";
 // import App from "./App";
@@ -79,8 +75,6 @@ AppRegistry.registerComponent(appName, () => App);
 //   }
 // };
 
-
-
 // // Register background handler
 // messaging().setBackgroundMessageHandler(firebaseListener);
 
@@ -94,4 +88,3 @@ AppRegistry.registerComponent(appName, () => App);
 // }
 
 // AppRegistry.registerComponent(appName, () => HeadlessCheck);
-

@@ -29,8 +29,9 @@ const LoginForm = ({navigation}) => {
   });
 
   const handleSubmit = (values, {resetForm}) => {
+    navigation.navigate('BottomStack');
     const {userName, password} = values;
-    if (userName.toLowerCase() == 'tempuser') {
+    if (userName.toLowerCase() !== 'tempuser') {
       return Snackbar.show({
         text: PASSWORD_NEEDED
           ? 'Login failed. Please try again.'
@@ -59,8 +60,8 @@ const LoginForm = ({navigation}) => {
   };
 
   const handleRegister = () => {
-    //  navigation.navigate('Registration');
-    navigation.navigate('ModeSelection');
+    navigation.navigate('Registration');
+    // navigation.navigate('ModeSelection');
   };
 
   return (
