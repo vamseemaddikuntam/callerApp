@@ -17,7 +17,6 @@ const PASSWORD_NEEDED = false;
 const LoginForm = ({navigation}) => {
   const dispatch = useDispatch();
   const {loading} = useSelector(state => state.auth);
-
   const initialValues = {
     email: '',
     password: PASSWORD_NEEDED ? '' : undefined,

@@ -4,13 +4,14 @@ import {
   SIGN_UP_URL,
   VERIFY_OTP_URL,
   LOGIN_URL,
-  MODE_THREE_URL,
+  MODE_CHANGE,
   UPDATE_PASSWORD_URL,
   UPDATE_PROFILE_URL,
   UPDATE_SECURITY_QUESTIONS_URL,
   APP_BASE_URL,
   RESEND_OTP_URL,
 } from './apiUrls';
+import {string} from 'yup';
 
 const apiInstance = axios.create({
   baseURL: APP_BASE_URL,
@@ -27,10 +28,9 @@ apiInstance.interceptors.request.use(
         config.headers.Authorization = `Bearer ${token}`;
       }
     }
-    console.log('config--->',config)
     return config;
   },
-  
+
   error => Promise.reject(error),
 );
 
@@ -43,7 +43,6 @@ apiInstance.interceptors.response.use(
     if (error.response && error.response.status === 401) {
       console.log('Unauthorized access - redirecting to login...');
     }
-    console.log('error===>',error.response)
     return Promise.reject(error.response);
   },
 );
@@ -88,12 +87,11 @@ export const resendOtp = async () => {
     throw error;
   }
 };
-export const modeThree = async () => {
+export const modeChange = async modeInfo => {
   try {
-    const response = await apiInstance.post(MODE_THREE_URL);
+    const response = await apiInstance.post(MODE_CHANGE, modeInfo);
     return response.data;
   } catch (error) {
-    console.error('Error in modeThree:', error);
     throw error;
   }
 };

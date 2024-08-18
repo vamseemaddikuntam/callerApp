@@ -1,35 +1,80 @@
 import React from 'react';
-import {View, Text, StyleSheet, ScrollView} from 'react-native';
+import {View, Text, StyleSheet} from 'react-native';
 import {Formik} from 'formik';
 import * as Yup from 'yup';
 import TextInputField from '../../../components/TextInputField';
 import ActionButton from '../../../components/ActionButton';
 import KeyboardAvoidingWrapper from '../../../utils/KeyboardAvoidingWrapper';
 import callerLogo from '../../../assets/image/caller.png';
+import Snackbar from 'react-native-snackbar';
+import {useDispatch, useSelector} from 'react-redux';
+import FullScreenLoader from '../../../components/FullScreenLoader';
+import {modeChange} from '../../../redux/actions/authActions';
 
 const ModeInputScreen = ({navigation, route}) => {
   const {mode} = route.params;
+  const dispatch = useDispatch();
+  const {loading, user} = useSelector(state => state.auth);
+  console.log('user--->', user);
 
   const validationSchema = Yup.object().shape({
-    password: Yup.string().required('Password is required'),
     ...(mode === 'ModeTwo' && {
-      domainId: Yup.string().required('Domain ID is required'),
+      ExtensionNO: Yup.string()
+        .required('Extension No is required')
+        .matches(/^\d+$/, 'Extension No must be a number'), // Match digits only
+      ExtensionPassword: Yup.string().required(
+        'Extension Password is required',
+      ),
     }),
     ...(mode === 'ModeThree' && {
-      extension: Yup.string().required('Extension is required'),
+      ExtensionNO: Yup.string()
+        .required('Extension No is required')
+        .matches(/^\d+$/, 'Extension No must be a number'), // Match digits only
     }),
   });
 
-  const handleSubmit = values => {
-    console.log(values);
-    navigation.goBack();
+  const handleSubmit = (
+    values: {ExtensionNO: string; ExtensionPassword?: string},
+    {resetForm}: any,
+  ) => {
+    console.log('Form Values:', values);
+
+    const {ExtensionNO, ExtensionPassword} = values;
+
+    dispatch(
+      modeChange({
+        ExtensionNO: Number(ExtensionNO),
+        ExtensionPassword: mode === 'ModeTwo' ? ExtensionPassword : undefined,
+        RequestMode: mode.toUpperCase(),
+      }),
+    )
+      .then(() => {
+        resetForm();
+        navigation.replace('BottomStack');
+      })
+      .catch((error: {data: {message: string}}) => {
+        Snackbar.show({
+          text: error.data
+            ? error?.data?.message
+            : 'Mode change failed. Please try again.',
+          duration: Snackbar.LENGTH_SHORT,
+          backgroundColor: '#FF5733',
+        });
+      });
   };
 
   return (
     <KeyboardAvoidingWrapper style={styles.container} imageSource={callerLogo}>
+      {loading && <FullScreenLoader />}
       <Text style={styles.header}>{`Enter details for ${mode}`}</Text>
       <Formik
-        initialValues={{password: '', domainId: '', extension: ''}}
+        initialValues={
+          mode === 'ModeTwo'
+            ? {ExtensionNO: '', ExtensionPassword: ''}
+            : mode === 'ModeThree'
+            ? {ExtensionNO: ''}
+            : {}
+        }
         validationSchema={validationSchema}
         onSubmit={handleSubmit}>
         {({
@@ -41,42 +86,32 @@ const ModeInputScreen = ({navigation, route}) => {
           touched,
         }) => (
           <>
-            <TextInputField
-              label="Password"
-              field={{
-                name: 'password',
-                value: values.password,
-                onChange: handleChange,
-                onBlur: handleBlur,
-              }}
-              form={{touched, errors}}
-              placeholder="Enter Password"
-              secureTextEntry
-            />
-            {mode === 'ModeTwo' && (
+            {mode !== 'ModeOne' && (
               <TextInputField
-                label="Domain ID"
+                label="Extension No"
                 field={{
-                  name: 'domainId',
-                  value: values.domainId,
+                  name: 'ExtensionNO',
+                  value: values.ExtensionNO, // Use string for input
                   onChange: handleChange,
                   onBlur: handleBlur,
                 }}
                 form={{touched, errors}}
-                placeholder="Enter Domain ID"
+                placeholder="Enter Extension No"
+                keyboardType="numeric" // Ensure number keyboard is used
               />
             )}
-            {mode === 'ModeThree' && (
+            {mode === 'ModeTwo' && (
               <TextInputField
-                label="Extension"
+                label="Extension Password"
                 field={{
-                  name: 'extension',
-                  value: values.extension,
+                  name: 'ExtensionPassword',
+                  value: values.ExtensionPassword,
                   onChange: handleChange,
                   onBlur: handleBlur,
                 }}
                 form={{touched, errors}}
-                placeholder="Enter Extension"
+                placeholder="Enter Extension Password"
+                secureTextEntry
               />
             )}
             <View style={styles.buttonContainer}>
@@ -84,9 +119,9 @@ const ModeInputScreen = ({navigation, route}) => {
                 title="Submit"
                 onPress={handleSubmit}
                 disabled={
-                  !values.password ||
-                  (mode === 'ModeTwo' && !values.domainId) ||
-                  (mode === 'ModeThree' && !values.extension)
+                  (mode === 'ModeTwo' &&
+                    (!values.ExtensionNO || !values.ExtensionPassword)) ||
+                  (mode === 'ModeThree' && !values.ExtensionNO)
                 }
               />
             </View>
@@ -100,14 +135,6 @@ const ModeInputScreen = ({navigation, route}) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    paddingHorizontal: 20,
-    marginTop: 50,
-    width: '100%',
-  },
-  scrollContainer: {
-    flexGrow: 1,
-    alignItems: 'center',
-    marginVertical: 50,
   },
   header: {
     fontSize: 24,
@@ -118,7 +145,7 @@ const styles = StyleSheet.create({
     width: '100%',
     alignItems: 'center',
     position: 'absolute',
-    bottom: 20,
+    bottom: 120,
   },
 });
 

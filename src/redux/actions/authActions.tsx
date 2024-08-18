@@ -14,6 +14,10 @@ import {
   PROFILE_UPDATE_REQUEST,
   PROFILE_UPDATE_SUCCESS,
   PROFILE_UPDATE_FAILURE,
+  MODE_CHANGE_REQUEST,
+  MODE_CHANGE_SUCCESS,
+  MODE_CHANGE_FAILURE,
+  LOGOUT,
 } from '../types';
 import {
   login as loginApi,
@@ -21,6 +25,7 @@ import {
   updateProfile as updateProfileApi,
   verifyOtp as verifyOtpApi,
   resendOtp as resendOtpApi,
+  modeChange as modeChangeApi,
 } from '../../api/apiInstance';
 import {Dispatch} from 'redux';
 
@@ -185,3 +190,46 @@ export const resendOtp =
       return Promise.reject(error);
     }
   };
+
+export const modeChange =
+  ({
+    ExtensionNO,
+    ExtensionPassword,
+    RequestMode,
+  }: {
+    ExtensionNO?: number;
+    ExtensionPassword?: string;
+    RequestMode: string;
+  }) =>
+  async (dispatch: Dispatch): Promise<void> => {
+    dispatch({type: MODE_CHANGE_REQUEST});
+    try {
+      const response = await modeChangeApi({
+        ExtensionNO,
+        ExtensionPassword,
+        RequestMode,
+      });
+      const {data} = response;
+      dispatch({type: MODE_CHANGE_SUCCESS, payload: data});
+      return Promise.resolve();
+    } catch (error) {
+      let errorMessage = 'An unexpected error occurred.';
+      if (error instanceof Error) {
+        errorMessage = error.message;
+      } else if (
+        typeof error === 'object' &&
+        error !== null &&
+        'response' in error
+      ) {
+        errorMessage = (error as any).response?.data?.message || errorMessage;
+      }
+      dispatch({type: MODE_CHANGE_FAILURE, payload: errorMessage});
+      return Promise.reject(error);
+    }
+  };
+
+export const logout = () => {
+  return {
+    type: LOGOUT,
+  };
+};

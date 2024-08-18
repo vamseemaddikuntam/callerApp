@@ -1,4 +1,4 @@
-import React, {useState, useEffect} from 'react';
+import React, {useState, useEffect, useCallback} from 'react';
 import {
   View,
   Text,
@@ -7,13 +7,16 @@ import {
   StyleSheet,
   Alert,
 } from 'react-native';
-import {useNavigation} from '@react-navigation/native';
+import {useFocusEffect, useNavigation} from '@react-navigation/native';
 import Icon from 'react-native-vector-icons/Ionicons';
+import {useDispatch, useSelector} from 'react-redux';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import {logout} from '../../../redux/actions/authActions';
 
 const modes = [
-  {id: 'mode1', title: 'Mode 1', screen: 'ModeOne'},
-  {id: 'mode2', title: 'Mode 2', screen: 'ModeTwo'},
-  {id: 'mode3', title: 'Mode 3', screen: 'ModeThree'},
+  {id: 'MODEONE', title: 'Mode 1', screen: 'ModeOne'},
+  {id: 'MODETWO', title: 'Mode 2', screen: 'ModeTwo'},
+  {id: 'MODETHREE', title: 'Mode 3', screen: 'ModeThree'},
 ];
 
 const settingsOptions = [
@@ -62,17 +65,21 @@ const settingsOptions = [
 ];
 
 const Settings = () => {
-  const [currentMode, setCurrentMode] = useState('mode1'); // Replace with the actual current mode from user data
+  const [currentMode, setCurrentMode] = useState('');
   const navigation = useNavigation();
+  const dispatch = useDispatch();
 
-  useEffect(() => {
-    // Fetch the current mode from user data or API if needed
-    // setCurrentMode(fetchedMode);
-  }, []);
+  const user = useSelector(state => state.auth.user);
+
+  useFocusEffect(
+    useCallback(() => {
+      setCurrentMode(user.ActiveMode || '');
+    }, [user?.ActiveMode]),
+  );
 
   const handleModeChange = mode => {
     if (mode.id === currentMode) {
-      return; // Do nothing if the mode is already selected
+      return;
     }
 
     Alert.alert(
@@ -108,7 +115,11 @@ const Settings = () => {
         },
         {
           text: 'Yes',
-          onPress: () => navigation.navigate('Login'),
+          onPress: async () => {
+            dispatch(logout());
+            await AsyncStorage.setItem('accessToken', '');
+            navigation.navigate('AuthStack');
+          },
         },
       ],
       {cancelable: false},

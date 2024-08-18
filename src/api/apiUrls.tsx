@@ -7,13 +7,12 @@ export const SIGN_UP_URL = '/gcm/signup';
 export const VERIFY_OTP_URL = '/gcm/verifyOtp';
 export const RESEND_OTP_URL = '/gcm/resendOtp';
 export const LOGIN_URL = '/gcm/login';
+export const MODE_CHANGE = '/gcm/Mode';
 
 // Call Endpoints
 export const INITIATE_CALL_URL = '/gcm/initiate-call';
 export const UPDATE_CALL_STATUS_URL = '/gcm/update-call';
 
-export const MODE_ONE_URL = '/gcm/ModeOne';
-export const MODE_THREE_URL = '/gcm/ModeThree';
 export const UPDATE_PASSWORD_URL = '/gcm/UpdatePassword';
 export const UPDATE_PROFILE_URL = '/gcm/UpdateProfile';
 export const UPDATE_SECURITY_QUESTIONS_URL = '/gcm/UpdateSecurityQuestions';

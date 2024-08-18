@@ -7,6 +7,8 @@ import ChangeSecurityScreen from '../screens/main/settings/changeSecurityScreen'
 import AboutUsScreen from '../screens/main/settings/aboutUsScreen';
 import ContactUsScreen from '../screens/main/settings/contactUsScreen';
 import LogoutScreen from '../screens/main/settings/logoutScreen';
+import ModeSelection from '../screens/auth/mode/ModeSelection';
+import ModeInputScreen from '../screens/auth/mode/ModeInputScreen';
 
 const Stack = createNativeStackNavigator();
 
@@ -54,6 +56,8 @@ export default function SettingsNavigation() {
       <Stack.Screen name="AboutUsScreen" component={AboutUsScreen} />
       <Stack.Screen name="ContactUsScreen" component={ContactUsScreen} />
       <Stack.Screen name="LogoutScreen" component={LogoutScreen} />
+      <Stack.Screen name="ModeSelection" component={ModeSelection} />
+      <Stack.Screen name="ModeInputScreen" component={ModeInputScreen} />
     </Stack.Navigator>
   );
 }

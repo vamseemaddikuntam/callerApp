@@ -22,7 +22,6 @@ const ProfileForm = ({ navigation }) => {
   });
 
   const handleSubmit = (values) => {
-    console.log('values-->', values)
     if (!isEditing) {
       dispatch(updateProfile(values));
       setIsEditing(false);
@@ -33,7 +32,7 @@ const ProfileForm = ({ navigation }) => {
     <KeyboardAvoidingWrapper style={styles.container} imageSource={callerLogo}>
       <Formik
         initialValues={{
-          fullName: user?.fullName || '',
+          fullName: user?.fullName || user?.username || '',
           email: user?.email || '',
           username: user?.username || '',
           mobileNo: user?.mobileNo || ''
