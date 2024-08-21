@@ -1,8 +1,8 @@
 import React from 'react';
-import { View, StyleSheet } from 'react-native';
+import {View, StyleSheet} from 'react-native';
 import ProfileForm from '../../../../components/ProfileForm';
 
-export default function MyProfileScreen({ navigation }) {
+export default function MyProfileScreen({navigation}) {
   return (
     <View style={styles.container}>
       <ProfileForm navigation={navigation} />
@@ -18,6 +18,3 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
   },
 });
-
-
-

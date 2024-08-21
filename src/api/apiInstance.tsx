@@ -99,10 +99,9 @@ export const modeChange = async modeInfo => {
 // apiInstance.js
 export const updateProfile = async profileData => {
   try {
-    const response = await apiInstance.put(UPDATE_PROFILE_URL, profileData); // Adjust endpoint as necessary
+    const response = await apiInstance.post(UPDATE_PROFILE_URL, profileData);
     return response.data;
   } catch (error) {
-    console.error('Error updating profile:', error);
     throw error;
   }
 };

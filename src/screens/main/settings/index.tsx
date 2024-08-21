@@ -19,62 +19,65 @@ const modes = [
   {id: 'MODETHREE', title: 'Mode 3', screen: 'ModeThree'},
 ];
 
-const settingsOptions = [
-  {
-    id: 'modeToggle',
-    title: 'Mode',
-    icon: 'options-outline',
-    isModeToggle: true,
-  },
-  {
-    id: 'profile',
-    title: 'My Profile',
-    icon: 'person-circle-outline',
-    screen: 'MyProfileScreen',
-  },
-  {
-    id: 'password',
-    title: 'Change Password',
-    icon: 'lock-closed-outline',
-    screen: 'ChangePasswordScreen',
-  },
-  {
-    id: 'security',
-    title: 'Change Security Question',
-    icon: 'shield-checkmark-outline',
-    screen: 'ChangeSecurityScreen',
-  },
-  {
-    id: 'about',
-    title: 'About Us',
-    icon: 'information-circle-outline',
-    screen: 'AboutUsScreen',
-  },
-  {
-    id: 'contact',
-    title: 'Contact Us',
-    icon: 'call-outline',
-    screen: 'ContactUsScreen',
-  },
-  {
-    id: 'logout',
-    title: 'Logout',
-    icon: 'log-out-outline',
-    screen: 'LogoutScreen',
-  },
-];
-
 const Settings = () => {
   const [currentMode, setCurrentMode] = useState('');
   const navigation = useNavigation();
   const dispatch = useDispatch();
-
   const user = useSelector(state => state.auth.user);
+  let activeMOde = user && user?.ActiveMode;
+  
+  const settingsOptions = [
+    {
+      id: 'modeToggle',
+      title: 'Mode',
+      icon: 'options-outline',
+      isModeToggle: true,
+    },
+    {
+      id: 'profile',
+      title: 'My Profile',
+      icon: 'person-circle-outline',
+      screen: 'MyProfileScreen',
+    },
+    {
+      id: 'password',
+      title: 'Change Password',
+      icon: 'lock-closed-outline',
+      screen: 'ChangePasswordScreen',
+      show: currentMode === 'MODETWO',
+    },
+    {
+      id: 'security',
+      title: 'Change Security Question',
+      icon: 'shield-checkmark-outline',
+      screen: 'ChangeSecurityScreen',
+      show: false,
+    },
+    {
+      id: 'about',
+      title: 'About Us',
+      icon: 'information-circle-outline',
+      screen: 'AboutUsScreen',
+    },
+    {
+      id: 'contact',
+      title: 'Contact Us',
+      icon: 'call-outline',
+      screen: 'ContactUsScreen',
+    },
+    {
+      id: 'logout',
+      title: 'Logout',
+      icon: 'log-out-outline',
+      screen: 'LogoutScreen',
+    },
+  ].filter(item => item.show !== false);
 
   useFocusEffect(
     useCallback(() => {
-      setCurrentMode(user.ActiveMode || '');
-    }, [user?.ActiveMode]),
+      setCurrentMode(user?.ActiveMode || '');
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [activeMOde]),
   );
 
   const handleModeChange = mode => {

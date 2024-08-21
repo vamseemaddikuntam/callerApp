@@ -14,7 +14,7 @@ export const INITIATE_CALL_URL = '/gcm/initiate-call';
 export const UPDATE_CALL_STATUS_URL = '/gcm/update-call';
 
 export const UPDATE_PASSWORD_URL = '/gcm/UpdatePassword';
-export const UPDATE_PROFILE_URL = '/gcm/UpdateProfile';
+export const UPDATE_PROFILE_URL = '/gcm/UpdateUserDetails';
 export const UPDATE_SECURITY_QUESTIONS_URL = '/gcm/UpdateSecurityQuestions';
 // Video SDK Endpoint
 export const CREATE_MEETING_URL = `${VIDEO_SDK_URL}/rooms`;

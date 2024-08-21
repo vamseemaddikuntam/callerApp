@@ -45,6 +45,11 @@ interface LoginResponse {
   data: User;
 }
 
+interface ProfileUpdateData {
+  username?: string;
+  email?: string;
+}
+
 export const login =
   (loginInfo: {email: string; password?: string}) =>
   async (dispatch: Dispatch): Promise<void> => {
@@ -110,10 +115,11 @@ export const signUp =
   };
 
 export const updateProfile =
-  (profileData: Partial<User>) =>
+  (profileData: ProfileUpdateData) =>
   async (dispatch: Dispatch): Promise<void> => {
     dispatch({type: PROFILE_UPDATE_REQUEST});
     try {
+      // Only send fields that are provided
       const response: {data: User} = await updateProfileApi(profileData);
       const {data} = response;
       const user: User = {
@@ -121,8 +127,6 @@ export const updateProfile =
         username: data.username,
         email: data.email,
         ActiveMode: data.ActiveMode,
-        fullName: data.fullName,
-        mobileNo: data.mobileNo,
       };
       dispatch({type: PROFILE_UPDATE_SUCCESS, payload: {user}});
       return Promise.resolve();

@@ -54,8 +54,9 @@ const authReducer = (state = initialState, action: any) => {
       };
 
     case RESEND_OTP_SUCCESS:
-    case PROFILE_UPDATE_SUCCESS:
       return {...state, loading: false};
+    case PROFILE_UPDATE_SUCCESS:
+      return {...state, user: action.payload.user, loading: false};
 
     case MODE_CHANGE_SUCCESS:
       return {
