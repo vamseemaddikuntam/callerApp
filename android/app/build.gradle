@@ -109,9 +109,7 @@ dependencies {
     implementation("com.facebook.react:react-android")
     implementation platform('com.google.firebase:firebase-bom:33.1.2')
     implementation 'com.google.firebase:firebase-analytics'
-    implementation project(':rnfgservice')
-    implementation project(':rnwebrtc')
-    // implementation project(':rnincallmanager')
+
     if (hermesEnabled.toBoolean()) {
         implementation("com.facebook.react:hermes-android")
     } else {

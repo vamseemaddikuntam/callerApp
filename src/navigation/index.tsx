@@ -6,9 +6,19 @@ import BottomStack from './BottomStack';
 
 const Stack = createNativeStackNavigator();
 
+const linking = {
+  prefixes: ['myapp://'],
+  config: {
+    screens: {
+      PhoneDialer: 'call/:callId',
+      History: 'history',
+    },
+  },
+};
+
 const RootNavigation = () => {
   return (
-    <NavigationContainer>
+    <NavigationContainer linking={linking}>
       <Stack.Navigator screenOptions={{headerShown: false}}>
         <Stack.Screen name="AuthStack" component={AuthStack} />
         <Stack.Screen name="BottomStack" component={BottomStack} />

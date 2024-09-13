@@ -4,8 +4,11 @@ import {Provider} from 'react-redux';
 import {PersistGate} from 'redux-persist/integration/react';
 import RootNavigation from './src/navigation';
 import {store, persistor} from './src/redux/store';
+import useIncomingCallHandler from './src/hooks/UseIncomingCallHandler'; // Import the hook
 
 export default function App() {
+  useIncomingCallHandler(); // Handle incoming calls with deep linking
+
   return (
     <Provider store={store}>
       <PersistGate loading={null} persistor={persistor}>
@@ -17,77 +20,49 @@ export default function App() {
   );
 }
 
-// import React, { useEffect } from "react";
-// import { GestureHandlerRootView } from 'react-native-gesture-handler';
-// import { NavigationContainer } from "@react-navigation/native";
-// import { createNativeStackNavigator } from "@react-navigation/native-stack";
-// import { SCREEN_NAMES } from "./src/navigation/screenNames";
-// import Meeting from "./src/screens/meeting";
-// import { LogBox, Text, Alert } from "react-native";
-// import Home from "./src/screens/home";
-// import OverlayPermissionModule from "videosdk-rn-android-overlay-permission";
-// import RNCallKeep from "react-native-callkeep";
-// LogBox.ignoreLogs(["Warning: ..."]);
-// LogBox.ignoreAllLogs();
 
-// const { Navigator, Screen } = createNativeStackNavigator();
+// import React, { useEffect } from 'react';
+// import { Alert, View, Text } from 'react-native';
+// import JailMonkey from 'jail-monkey';
+// import RootChecker from 'react-native-root-checker';
 
-// const linking = {
-//   prefixes: ["videocalling://"],
-//   config: {
-//     screens: {
-//       meetingscreen: {
-//         path: `meetingscreen/:token/:meetingId`,
-//       },
-//     },
-//   },
+// const checkDeviceSecurity = async () => {
+//   // Check using JailMonkey
+//   RootChecker.isRootedByNativeRootCheck()
+//   .then((isRooted) => {
+//     console.log('isRooted--->',isRooted)
+//     Alert.alert('Native Root Check', isRooted ? 'Device is rooted!' : 'Device is not rooted.');
+//   })
+//   .catch((error) => {
+//     console.error('Error during Native Root Check:', error);
+//   });
+
+//   const isJailBroken = JailMonkey.isJailBroken();
+//   console.log('isJailBroken || isRooted--->',isJailBroken)
+ 
+//   if (isJailBroken) {
+//     Alert.alert(
+//       "Security Warning",
+//       "Your device is rooted or jailbroken. Access is restricted for your security.",
+//       [{ text: "OK", onPress: () => console.log("Access Restricted") }]
+//     );
+//     // Handle restricted access or limited functionality here
+//   } else {
+//     // Proceed with normal app functionality
+//     console.log("Device is secure. Proceeding with app functionality.");
+//   }
 // };
 
-// export default function App() {
+// const App = () => {
 //   useEffect(() => {
-//     const options = {
-//       ios: {
-//         appName: "VideoSDK",
-//       },
-//       android: {
-//         alertTitle: "Permissions required",
-//         alertDescription:
-//           "This application needs to access your phone accounts",
-//         cancelButton: "Cancel",
-//         okButton: "ok",
-//         imageName: "phone_account_icon",
-//       },
-//     };
-//     RNCallKeep.setup(options);
-//     RNCallKeep.setAvailable(true);
-
-//     if (Platform.OS === "android") {
-//       OverlayPermissionModule.requestOverlayPermission();
-//     }
+//     checkDeviceSecurity();
 //   }, []);
 
 //   return (
-//     <GestureHandlerRootView style={{ flex: 1 }}>
-//     <NavigationContainer linking={linking} fallback={<Text>Loading...</Text>}>
-//       <Navigator
-//         screenOptions={{
-//           animationEnabled: false,
-//           presentation: "modal",
-//         }}
-//         initialRouteName={SCREEN_NAMES.Home}
-//       >
-//         <Screen
-//           name={SCREEN_NAMES.Meeting}
-//           component={Meeting}
-//           options={{ headerShown: false }}
-//         />
-//         <Screen
-//           name={SCREEN_NAMES.Home}
-//           component={Home}
-//           options={{ headerShown: false }}
-//         />
-//       </Navigator>
-//     </NavigationContainer>
-//     </GestureHandlerRootView>
+//     <View>
+//       <Text>Welcome to the Secure App</Text>
+//     </View>
 //   );
-// }
+// };
+
+// export default App;

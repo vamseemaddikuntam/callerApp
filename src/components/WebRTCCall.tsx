@@ -1,36 +1,100 @@
-import React, { useState, useRef } from 'react';
-import { View, Text, Button, StyleSheet } from 'react-native';
-import { RTCPeerConnection, RTCView, mediaDevices } from 'react-native-webrtc';
+// WebRTCCall.js
+import React, {useState, useEffect} from 'react';
+import {View, StyleSheet, Button, Text, ActivityIndicator} from 'react-native';
+import {RTCView, mediaDevices} from 'react-native-webrtc';
+import Peer from 'peerjs';
+import InCallManager from 'react-native-incall-manager';
 
-const WebRTCCall = ({ closeModal, phoneNumber }) => {
+const WebRTCCall = ({closeModal, phoneNumber, callType}) => {
   const [stream, setStream] = useState(null);
-  const peerConnection = useRef(new RTCPeerConnection({
-    iceServers: [
-      { urls: 'stun:stun.l.google.com:19302' },
-    ],
-  }));
+  const [peer, setPeer] = useState(null);
+  const [peerId, setPeerId] = useState('');
+  const [remoteStream, setRemoteStream] = useState(null);
+  const [loading, setLoading] = useState(true);
 
-  const startCall = async () => {
-    const localStream = await mediaDevices.getUserMedia({ video: true, audio: true });
-    setStream(localStream);
+  useEffect(() => {
+    const initializePeer = () => {
+      const newPeer = new Peer(); // Create a new PeerJS instance
+      setPeer(newPeer);
 
-    localStream.getTracks().forEach(track => {
-      peerConnection.current.addTrack(track, localStream);
-    });
+      newPeer.on('open', id => {
+        setPeerId(id);
+        console.log('Peer ID:', id);
+        setLoading(false);
+      });
 
-    const offer = await peerConnection.current.createOffer();
-    await peerConnection.current.setLocalDescription(offer);
+      newPeer.on('call', async call => {
+        const localStream = await mediaDevices.getUserMedia({
+          audio: true,
+          video: callType === 'video', // Enable video only for video calls
+        });
+        setStream(localStream);
+        call.answer(localStream); // Answer the call with the local stream
+        call.on('stream', remoteStream => {
+          setRemoteStream(remoteStream); // Set the remote stream
+        });
+      });
 
-    // You would typically send the offer to the remote peer here
+      return newPeer;
+    };
+
+    const setupCall = async () => {
+      if (peer && phoneNumber) {
+        const localStream = await mediaDevices.getUserMedia({
+          audio: true,
+          video: callType === 'video', // Enable video only for video calls
+        });
+        setStream(localStream);
+
+        const call = peer.call(phoneNumber, localStream); // Initiate the call
+        call.on('stream', remoteStream => {
+          setRemoteStream(remoteStream); // Set the remote stream
+        });
+      }
+    };
+
+    const newPeer = initializePeer();
+    setupCall();
+
+    return () => {
+      newPeer.disconnect();
+      newPeer.destroy();
+      stream && stream.getTracks().forEach(track => track.stop());
+    };
+  }, [callType, phoneNumber]);
+
+  const endCall = () => {
+    InCallManager.stop();
+    closeModal();
   };
 
   return (
     <View style={styles.container}>
-      <Text>Calling {phoneNumber}</Text>
-      {stream && (
-        <RTCView streamURL={stream.toURL()} style={styles.stream} />
+      {!loading ? (
+        <>
+          <Text>LOadinggggg</Text>
+          <ActivityIndicator size="large" color="#0000ff" />
+        </>
+      ) : (
+        <View style={styles.callContainer}>
+          {remoteStream && (
+            <>
+              <Text>Remote</Text>
+              <RTCView
+                streamURL={remoteStream.toURL()}
+                style={styles.remoteVideo}
+              />
+            </>
+          )}
+          {stream && (
+            <>
+              <Text>LOcal</Text>
+              <RTCView streamURL={stream.toURL()} style={styles.localVideo} />
+            </>
+          )}
+          <Button title="End Call" onPress={endCall} />
+        </View>
       )}
-      <Button title="End Call" onPress={closeModal} />
     </View>
   );
 };
@@ -41,9 +105,25 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
-  stream: {
-    width: 200,
-    height: 200,
+  callContainer: {
+    flex: 1,
+    width: '100%',
+    height: '100%',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  remoteVideo: {
+    width: '100%',
+    height: '80%',
+  },
+  localVideo: {
+    width: 100,
+    height: 100,
+    position: 'absolute',
+    bottom: 20,
+    right: 20,
+    borderWidth: 1,
+    borderColor: 'white',
   },
 });
 

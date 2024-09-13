@@ -1,5 +1,6 @@
 import React, {useEffect} from 'react';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
+import {Platform, Alert} from 'react-native';
 import SplashScreen from '../screens/splash';
 import Login from '../screens/auth/login';
 import Registration from '../screens/auth/registration';
@@ -7,33 +8,55 @@ import OTPScreen from '../screens/auth/registration/OTPScreen';
 import ModeSelection from '../screens/auth/mode/ModeSelection';
 import ModeInputScreen from '../screens/auth/mode/ModeInputScreen';
 import {COLORS} from '../theme';
-import OverlayPermissionModule from 'videosdk-rn-android-overlay-permission';
 import RNCallKeep from 'react-native-callkeep';
-import {Platform} from 'react-native';
+import {request, PERMISSIONS, RESULTS} from 'react-native-permissions';
 
 const Stack = createNativeStackNavigator();
 
 const AuthStack = () => {
   useEffect(() => {
-    const options = {
-      ios: {
-        appName: 'VideoSDK',
-      },
-      android: {
-        alertTitle: 'Permissions required',
-        alertDescription:
-          'This application needs to access your phone accounts',
-        cancelButton: 'Cancel',
-        okButton: 'ok',
-        imageName: 'phone_account_icon',
-      },
-    };
-    RNCallKeep.setup(options);
-    RNCallKeep.setAvailable(true);
+    const setupCallKeep = async () => {
+      const options = {
+        ios: {
+          appName: 'GCMDialler',
+        },
+        android: {
+          alertTitle: 'Permissions required',
+          alertDescription:
+            'This application needs to access your phone accounts',
+          cancelButton: 'Cancel',
+          okButton: 'ok',
+          imageName: 'phone_account_icon',
+        },
+      };
+      RNCallKeep.setup(options);
+      RNCallKeep.setAvailable(true);
 
-    if (Platform.OS === 'android') {
-      OverlayPermissionModule.requestOverlayPermission();
-    }
+      if (Platform.OS === 'android') {
+        // Request runtime permissions
+        const permissions = [
+          PERMISSIONS.ANDROID.CAMERA,
+          PERMISSIONS.ANDROID.RECORD_AUDIO,
+          PERMISSIONS.ANDROID.READ_EXTERNAL_STORAGE,
+          PERMISSIONS.ANDROID.WRITE_EXTERNAL_STORAGE,
+        ];
+
+        const statuses = await Promise.all(
+          permissions.map(permission => request(permission)),
+        );
+
+        statuses.forEach((status, index) => {
+          if (status !== RESULTS.GRANTED) {
+            Alert.alert(
+              'Permission Required',
+              `The following permission is needed: ${permissions[index]}`,
+            );
+          }
+        });
+      }
+    };
+
+    setupCallKeep();
   }, []);
 
   return (

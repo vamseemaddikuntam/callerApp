@@ -4,15 +4,10 @@
 import 'react-native-get-random-values';
 import {AppRegistry} from 'react-native';
 import App from './App';
-import messaging from '@react-native-firebase/messaging';
 import VoipPushNotification from 'react-native-voip-push-notification';
 import {name as appName} from './app.json';
 
 // Register background handler
-messaging().setBackgroundMessageHandler(async remoteMessage => {
-  console.log('Message handled in the background!', remoteMessage);
-});
-
 VoipPushNotification.addEventListener('register', token => {
   console.log('APNs Token:', token);
 });
@@ -21,11 +16,6 @@ VoipPushNotification.addEventListener('notification', notification => {
   console.log('VoIP Notification:', notification);
   VoipPushNotification.onVoipNotificationCompleted(notification.uuid);
 });
-
-import {register} from '@videosdk.live/react-native-sdk';
-
-// Register the VideoSDK service
-register();
 
 AppRegistry.registerComponent(appName, () => App);
 
